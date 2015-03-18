@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.filecache.DistributedCache;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -209,8 +210,8 @@ public class TeraSort extends Configured implements Tool {
       try {
         FileSystem fs = FileSystem.getLocal(conf);
         this.conf = conf;
-        Path partFile = new Path(TeraInputFormat.PARTITION_FILENAME);
-        splitPoints = readPartitions(fs, partFile, conf);
+        Path[] localPaths = DistributedCache.getLocalCacheFiles(conf);
+        splitPoints = readPartitions(fs, localPaths[0], conf);
         trie = buildTrie(splitPoints, 0, splitPoints.length, new Text(), 2);
       } catch (IOException ie) {
         throw new IllegalArgumentException("can't read partitions file", ie);
